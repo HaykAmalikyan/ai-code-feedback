@@ -1,0 +1,19 @@
+# Environments
+.env
+.env.*
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Firebase/Secrets
+firebase-credentials.json
+
+# Node
+node_modules/
+dist/
+.DS_Store
