@@ -95,7 +95,7 @@ export default function MainScreen({ user, setUser }) {
 
   const handleGetFeedback = async () => {
     if (!code.trim()) return;
-    
+
     setIsLoading(true);
     setError(null);
     setFeedback(null);
@@ -140,7 +140,7 @@ export default function MainScreen({ user, setUser }) {
 
   return (
     <div className="flex-1 flex flex-col lg:flex-row max-w-7xl mx-auto w-full p-4 lg:p-8 gap-6 relative">
-      
+
       {/* Sidebar: History */}
       <div className="w-full lg:w-72 flex flex-col gap-4">
         <div className="bg-dark-800 rounded-xl p-4 border border-dark-700 shadow-lg flex flex-col h-[calc(100vh-8rem)] sticky top-4">
@@ -148,7 +148,7 @@ export default function MainScreen({ user, setUser }) {
             <History className="w-5 h-5 text-brand-400" />
             History
           </h2>
-          
+
           <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
             {isLoadingHistory ? (
               <div className="flex items-center justify-center py-8 text-gray-500">
@@ -186,11 +186,11 @@ export default function MainScreen({ user, setUser }) {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col gap-6 w-full max-w-4xl">
-        
+
         {/* Rate the App Button */}
         {!user.hasRated && (
           <div className="flex justify-end">
-            <button 
+            <button
               onClick={() => setShowRatingModal(true)}
               className="flex items-center gap-2 bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border border-yellow-500/50 px-4 py-2 rounded-lg font-medium transition-colors text-sm"
             >
@@ -204,9 +204,9 @@ export default function MainScreen({ user, setUser }) {
         <section className="bg-dark-800 rounded-xl p-6 border border-dark-700">
           <h2 className="text-xl font-semibold mb-2">How it works</h2>
           <p className="text-gray-400">
-            Paste your code below and click <span className="text-white font-medium">Get Feedback</span>. 
-            Our AI tutor will explain your mistakes in plain language to help you learn, 
-            without giving away the exact answer.
+            Paste your code below and click <span className="text-white font-medium">Get Feedback</span>.
+            Our AI tutor will explain your mistakes in plain language to help you learn,
+            without giving away the exact answer!
           </p>
         </section>
 
@@ -286,23 +286,23 @@ export default function MainScreen({ user, setUser }) {
         {/* Results Area */}
         {feedback && (
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
-            
+
             {/* Main Feedback Box */}
             <div className="bg-dark-800 border border-brand-500/30 rounded-xl p-6 shadow-lg relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-brand-500"></div>
-              
+
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-xl font-semibold flex items-center gap-2">
                   <Lightbulb className="w-6 h-6 text-brand-400" />
                   Tutor's Feedback
                 </h3>
-                
+
                 <div className="flex items-center gap-2 bg-dark-900 px-3 py-1.5 rounded-full border border-dark-700">
                   <Star className="w-4 h-4 text-yellow-500 fill-yellow-500/20" />
                   <span className="text-sm font-medium">Code Score: {feedback.score}/10</span>
                 </div>
               </div>
-              
+
               <div className="prose prose-invert max-w-none">
                 <ReactMarkdown>{feedback.feedback}</ReactMarkdown>
               </div>
@@ -311,14 +311,14 @@ export default function MainScreen({ user, setUser }) {
             {/* Tips Accordion */}
             {feedback.tips && feedback.tips !== "N/A" && (
               <div className="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden">
-                <button 
+                <button
                   onClick={() => setShowTips(!showTips)}
                   className="w-full px-6 py-4 flex items-center justify-between hover:bg-dark-700/50 transition-colors"
                 >
                   <span className="font-medium text-gray-300">Optional: Code Quality Tips</span>
                   {showTips ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
                 </button>
-                
+
                 {showTips && (
                   <div className="px-6 pb-6 pt-2 border-t border-dark-700/50">
                     <div className="prose prose-invert max-w-none text-sm text-gray-400">
@@ -331,16 +331,16 @@ export default function MainScreen({ user, setUser }) {
 
           </section>
         )}
-        
+
         {/* Pad bottom */}
         <div className="h-12"></div>
       </div>
 
       {showRatingModal && (
-        <RatingModal 
-          user={user} 
-          setUser={setUser} 
-          onClose={() => setShowRatingModal(false)} 
+        <RatingModal
+          user={user}
+          setUser={setUser}
+          onClose={() => setShowRatingModal(false)}
         />
       )}
     </div>
