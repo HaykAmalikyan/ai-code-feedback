@@ -34,6 +34,41 @@ import ReactMarkdown from 'react-markdown';
 import RatingModal from './RatingModal';
 import { API_BASE_URL } from '../config';
 
+const extractJsonFromString = (str) => {
+  if (typeof str !== 'string') return null;
+  const trimmed = str.trim();
+  
+  // Try direct parse
+  try {
+    return JSON.parse(trimmed);
+  } catch (e) {}
+
+  // Try extracting the JSON block using regex
+  const match = trimmed.match(/(\{[\s\S]*\})/);
+  if (match) {
+    try {
+      return JSON.parse(match[1]);
+    } catch (e) {}
+  }
+  return null;
+};
+
+const processFeedbackData = (data) => {
+  if (!data) return null;
+  
+  let processed = { ...data };
+  
+  // If feedback contains JSON (or is JSON), extract it.
+  const extracted = extractJsonFromString(processed.feedback);
+  if (extracted) {
+    if (extracted.feedback) processed.feedback = extracted.feedback;
+    if (extracted.tips) processed.tips = extracted.tips;
+    if (extracted.score !== undefined) processed.score = extracted.score;
+  }
+  
+  return processed;
+};
+
 export default function MainScreen({ user, setUser }) {
   const [code, setCode] = useState('# Write or paste your code here...\n\n');
   const [language, setLanguage] = useState("Python");
@@ -65,11 +100,12 @@ export default function MainScreen({ user, setUser }) {
 
   const handleHistoryClick = (item) => {
     setCode(item.submittedCode || "");
-    setFeedback({
+    const processed = processFeedbackData({
       feedback: item.aiFeedback,
       tips: item.aiTips,
       score: item.score
     });
+    setFeedback(processed);
     setShowTips(false);
     setError(null);
     setSyntaxErrors([]);
@@ -109,18 +145,8 @@ export default function MainScreen({ user, setUser }) {
         language: language,
         errors: syntaxErrors.map(e => e.message)
       });
-      let data = response.data;
-      if (data && data.feedback && typeof data.feedback === 'string' && data.feedback.trim().startsWith('{')) {
-        try {
-          const parsed = JSON.parse(data.feedback);
-          if (parsed.feedback) data.feedback = parsed.feedback;
-          if (parsed.tips) data.tips = parsed.tips;
-          if (parsed.score) data.score = parsed.score;
-        } catch (e) {
-          console.error("Failed to parse nested JSON in feedback", e);
-        }
-      }
-      setFeedback(data);
+      const processed = processFeedbackData(response.data);
+      setFeedback(processed);
       // Refresh history after new submission
       fetchHistory();
     } catch (err) {

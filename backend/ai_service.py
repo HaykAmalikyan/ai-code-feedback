@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 
@@ -11,6 +12,37 @@ client = InferenceClient(
     provider="auto",
     api_key=HF_API_TOKEN,
 )
+
+def extract_json_from_text(text: str) -> dict:
+    text = text.strip()
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Try removing markdown code block ticks
+    clean_text = text
+    if clean_text.startswith("```json"):
+        clean_text = clean_text[7:]
+    elif clean_text.startswith("```"):
+        clean_text = clean_text[3:]
+    if clean_text.endswith("```"):
+        clean_text = clean_text[:-3]
+    clean_text = clean_text.strip()
+    try:
+        return json.loads(clean_text)
+    except json.JSONDecodeError:
+        pass
+
+    # Try searching for JSON using regex
+    match = re.search(r'(\{.*\})', text, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(1))
+        except json.JSONDecodeError:
+            pass
+
+    return None
 
 def build_system_prompt(language: str) -> str:
     return f"""
@@ -69,21 +101,16 @@ async def get_feedback(code: str, language: str = "Python", errors: list[str] = 
         )
 
         generated_text = completion.choices[0].message.content
-        clean_text = generated_text.strip()
-
-        if clean_text.startswith("```json"):
-            clean_text = clean_text[7:]
-        if clean_text.startswith("```"):
-            clean_text = clean_text[3:]
-        if clean_text.endswith("```"):
-            clean_text = clean_text[:-3]
-
-        parsed_json = json.loads(clean_text.strip())
-        return {
-            "feedback": parsed_json.get("feedback", "No feedback provided."),
-            "tips": parsed_json.get("tips", "No tips provided."),
-            "score": int(parsed_json.get("score", 5))
-        }
+        parsed_json = extract_json_from_text(generated_text)
+        
+        if parsed_json:
+            return {
+                "feedback": parsed_json.get("feedback", "No feedback provided."),
+                "tips": parsed_json.get("tips", "No tips provided."),
+                "score": int(parsed_json.get("score", 5))
+            }
+        else:
+            raise json.JSONDecodeError("Failed to extract JSON from completion", generated_text, 0)
 
     except json.JSONDecodeError:
         print(f"JSON Parsing Error. Raw output: {generated_text}")
