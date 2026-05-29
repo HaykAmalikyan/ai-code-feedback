@@ -30,6 +30,7 @@ const getLanguageExtension = (lang) => {
 };
 import { Send, Loader2, Lightbulb, ChevronDown, ChevronUp, Star, Clock, History } from 'lucide-react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 import RatingModal from './RatingModal';
 import { API_BASE_URL } from '../config';
 
@@ -303,10 +304,7 @@ export default function MainScreen({ user, setUser }) {
               </div>
               
               <div className="prose prose-invert max-w-none">
-                {/* Splitting by newlines to render simple paragraphs, assuming markdown-ish output */}
-                {feedback.feedback.split('\n').map((paragraph, idx) => (
-                  paragraph.trim() ? <p key={idx} className="text-gray-300 leading-relaxed mb-2">{paragraph}</p> : null
-                ))}
+                <ReactMarkdown>{feedback.feedback}</ReactMarkdown>
               </div>
             </div>
 
@@ -324,9 +322,7 @@ export default function MainScreen({ user, setUser }) {
                 {showTips && (
                   <div className="px-6 pb-6 pt-2 border-t border-dark-700/50">
                     <div className="prose prose-invert max-w-none text-sm text-gray-400">
-                      {feedback.tips.split('\n').map((tip, idx) => (
-                        tip.trim() ? <p key={idx} className="mb-1">{tip}</p> : null
-                      ))}
+                      <ReactMarkdown>{feedback.tips}</ReactMarkdown>
                     </div>
                   </div>
                 )}
